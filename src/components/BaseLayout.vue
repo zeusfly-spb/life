@@ -18,7 +18,7 @@
             x: fieldIndex * cellSize,
             width: cellSize,
             height: cellSize,
-            fill: field ? 'grey' : '#fff9c4',
+            fill: field ? 'green' : 'white',
           }"
         />
       </div>
@@ -30,6 +30,7 @@
 export default {
   name: 'BaseLayout',
   data: () => ({
+    areaSize: 600,
     commonKey: 0,
     grid: [],
     cellSize: 20,
@@ -42,15 +43,15 @@ export default {
   computed: {
     configKonva() {
       return {
-        width: 600,
-        height: 600,
+        width: this.areaSize,
+        height: this.areaSize,
       }
     },
     lenX() {
-      return Math.round(window.innerWidth / this.cellSize);
+      return Math.round(this.areaSize / this.cellSize);
     },
     lenY() {
-      return Math.round(window.innerHeight / this.cellSize);
+      return Math.round(this.areaSize / this.cellSize);
     },
   },
   created() {
@@ -59,7 +60,7 @@ export default {
   mounted() {
     this.seed();
       // eslint-disable-next-line vue/no-async-in-computed-properties
-    // return setInterval(() => this.makeLife(), 170);
+    return setInterval(() => this.makeLife(), 170);
 
   },
   methods: {
@@ -71,51 +72,33 @@ export default {
       }
     },
     touchCell({x, y}) {
-      // return this.$refs[`x${x}y${y}`];
-      // return this.prepareField(({x, y}));
+
       return this.prepareField({x: x, y: y});
     },
     switchField({x, y}) {
       this.grid[y][x] = !this.grid[y][x];
       this.commonKey++;
     },
+    neighbourCount({x, y}) {
+      const all = [];
+      all.push(x && y ? this.grid[y-1][x-1] : false); //A
+      all.push(y ? this.grid[y-1][x] : false); //B
+      all.push(y && x < this.lenX ? this.grid[y-1][x+1] : false); //C
+      all.push(x ? this.grid[y][x-1] : false); //D
+      all.push(x < this.lenX ? this.grid[y][x+1] : false); //E
+      all.push(x && y < this.lenY ? this.grid[y+1][x-1] : false); //F
+      all.push(y < this.lenY ? this.grid[y+1][x] : false); //G
+      all.push(y < this.lenY && x < this.lenX ? this.grid[y+1][x+1] : false); //H
+      return all.filter(item => !!item).length;
+    },
     prepareField({x, y}) {
-      console.log('Начинаем процедуры')
-      const neighbourFields = [];
-      if (x > 0) {//ADF
-        if (y > 0) {
-          neighbourFields.push(this.grid[y - 1][x - 1]);
-        }
-        neighbourFields.push(this.grid[y][x - 1]);
-        if (y < this.lenY) {
-          neighbourFields.push(this.grid[y + 1][x - 1]);
-        }
-      }
-      if(x < this.lenX) {//CEH
-        if (y > 0) {
-          neighbourFields.push(this.grid[y - 1][x + 1]);
-        }
-        neighbourFields.push(this.grid[y][x + 1]);
-        if (y < this.lenY) {
-          neighbourFields.push(this.grid[y + 1][x + 1]);
-        }
-      }
-      if (y > 0) {//B
-        neighbourFields.push(this.grid[y - 1][x]);
-      }
-      if (y < this.lenY) {//G
-        neighbourFields.push(this.grid[y + 1][x]);
-      }
-      const aliveNeighbours = neighbourFields.filter(item => !!item);
-      // console.log('Живых соседей: ' + aliveNeighbours.length);
+      const aliveNeighbours = this.neighbourCount({x,y});
       if (!this.grid[y][x] && aliveNeighbours === 3) {
         this.grid[y][x] = true;
-        console.log(`Возрождаем клетку (${x},${y})`)
       }
       if (this.grid[y][x]) {
         if (aliveNeighbours < 2 || aliveNeighbours > 3) {
           this.grid[y][x] = false;
-          console.log(`Убиваем клетку (${x},${y}), по причине ${aliveNeighbours < 2 ? 'Одиночества' : 'Перенаселения'} `)
         }
       }
       this.commonKey++;
