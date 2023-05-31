@@ -7,11 +7,12 @@
 </template>
 
 <script setup>
-  import BaseLayout from "@/components/BaseLayout.vue";
-  function updateTitle(text) {
-    const titleEl = document.querySelector('head title');
-    titleEl.textContent = text;
-  }
+import BaseLayout from './components/BaseLayout.vue';
+
+function updateTitle(text) {
+  const titleEl = document.querySelector('head title');
+  titleEl.textContent = text;
+}
 </script>
 
 <style>

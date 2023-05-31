@@ -1,11 +1,8 @@
-import Vue from 'vue'
-import App from './App.vue'
+import Vue from 'vue';
 
 import VueMeta from 'vue-meta';
 import VueKonva from 'vue-konva';
-
-import vueHeadful from 'vue-headful';
-Vue.component('vue-headful', vueHeadful);
+import App from './App.vue';
 
 Vue.use(VueMeta);
 Vue.use(VueKonva);
@@ -13,5 +10,5 @@ Vue.use(VueKonva);
 Vue.config.productionTip = false;
 
 new Vue({
-  render: h => h(App),
-}).$mount('#app')
+  render: (h) => h(App),
+}).$mount('#app');
