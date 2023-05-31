@@ -1,27 +1,30 @@
 <template>
-  <v-stage :config="configKonva">
-    <v-layer>
-      <div v-for="(row, rowIndex) in grid" :key="'row' + rowIndex">
-        <v-rect
-          v-for="(field, fieldIndex) in row"
-          :key="'field' + fieldIndex + commonKey"
-          :config="{
-            strokeWidth: 4,
-            stroke: 'white',
-            y: rowIndex * cellSize,
-            x: fieldIndex * cellSize,
-            width: cellSize,
-            height: cellSize,
-            fill: field ? 'green' : 'white',
-          }"
-        />
-      </div>
-    </v-layer>
-  </v-stage>
+  <div id="container">
+    <v-stage :config="configKonva" class="stage">
+      <v-layer>
+        <div v-for="(row, rowIndex) in grid" :key="'row' + rowIndex">
+          <component
+            :is="'v-rect'"
+            v-for="(field, fieldIndex) in row"
+            :key="'field' + fieldIndex + commonKey"
+            :config="{
+              strokeWidth: 4,
+              stroke: 'white',
+              y: rowIndex * cellSize,
+              x: fieldIndex * cellSize,
+              width: cellSize,
+              height: cellSize,
+              fill: field ? 'green' : 'white',
+            }"
+          />
+        </div>
+      </v-layer>
+    </v-stage>
+  </div>
 </template>
 
 <script setup>
-/* eslint-disable no-shadow,no-use-before-define,no-plusplus */
+/* eslint-disable no-shadow,no-use-before-define,no-plusplus,arrow-parens */
 import {
   ref, computed, defineEmits, watch, onMounted,
 } from 'vue';
@@ -42,7 +45,6 @@ const lenY = computed(() => Math.round(areaSize.value / cellSize.value));
 function seed() {
   const aliveCount = 300;
   for (let i = 0; i <= aliveCount; i++) {
-    // eslint-disable-next-line no-use-before-define
     const x = random(lenX.value);
     const y = random(lenY.value);
     grid.value[y][x] = true;
@@ -119,3 +121,19 @@ onMounted(() => {
   setInterval(() => makeLife(), 100);
 });
 </script>
+
+<style>
+#container {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+}
+
+.stage {
+  max-height: 100%;
+}
+</style>
