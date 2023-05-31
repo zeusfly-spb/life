@@ -1,12 +1,11 @@
-import Vue from 'vue'
-import App from './App.vue'
+import { createApp } from 'vue';
+import { createMetaManager } from 'vue-meta';
+
 import VueKonva from 'vue-konva';
-import vueHeadful from 'vue-headful';
-Vue.component('vue-headful', vueHeadful);
+import App from './App.vue';
 
-Vue.use(VueKonva);
-Vue.config.productionTip = false;
+const app = createApp(App);
+app.use(VueKonva)
+  .use(createMetaManager());
 
-new Vue({
-  render: h => h(App),
-}).$mount('#app')
+app.mount('#app');

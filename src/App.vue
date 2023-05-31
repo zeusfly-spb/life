@@ -1,40 +1,66 @@
 <template>
   <div id="app">
-      <vue-headful
-        :title="titleText"
-        description="LIFE"
-      />
+    <div class="controls">
+      <label for="color-input">
+        Разноцветные блоки
+        <input id="color-input" v-model="multicolored" type="checkbox" />
+      </label>
+      <label for="unlimited-input">
+        Бесконечное поле
+        <input id="unlimited-input" v-model="unlimited" type="checkbox" />
+      </label>
+      <label for="type-select">
+        Тип фигуры
+        <select id="type-select" v-model="type">
+          <option v-for="type in types" :key="type.name" :value="type.value">
+            {{ type.name }}
+          </option>
+        </select>
+      </label>
+    </div>
     <BaseLayout
+      :active="active"
+      :multicolor="multicolored"
+      :type="type"
+      :unlimited="unlimited"
+      @changeActive="active = !active"
       @changeCount="updateTitle"
     />
   </div>
 </template>
 
-<script>
-import BaseLayout from "@/components/BaseLayout.vue";
-export default {
-  name: 'App',
-  components: {
-    BaseLayout
-  },
-  data: () => ({
-    titleText: '',
-  }),
-  methods: {
-    updateTitle(text) {
-      this.titleText = text;
-    }
-  }
+<script setup>
+import { ref } from "vue";
+import BaseLayout from "./components/BaseLayout.vue";
+
+const multicolored = ref(true);
+const active = ref(true);
+const type = ref("v-rect");
+const unlimited = ref(false);
+
+const types = [
+  { name: "Квадрат", value: "v-rect" },
+  { name: "Круг", value: "v-circle" },
+  { name: "Звезда", value: "v-star" },
+];
+
+function updateTitle(text) {
+  const titleEl = document.querySelector("head title");
+  titleEl.textContent = text;
 }
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+.controls {
+  width: 100vw;
+  height: 5vh;
+  display: flex !important;
+  justify-content: space-around;
+  align-items: center;
+}
+
+#type-select {
+  border: none;
+  background: white;
 }
 </style>
