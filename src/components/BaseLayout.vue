@@ -2,18 +2,17 @@
   <v-stage
     :config="configKonva"
   >
-     <v-layer>
+    <v-layer>
       <div
         v-for="(row, rowIndex) in grid"
         :key="'row' + rowIndex"
       >
         <v-rect
-          @click="touchCell({x: fieldIndex, y: rowIndex})"
-          :ref="`x${fieldIndex}y${rowIndex}`"
           v-for="(field, fieldIndex) in row"
           :key="'field' + fieldIndex + commonKey"
           :config="{
-            ...rectConfig,
+            strokeWidth: 4,
+            stroke: 'white',
             y: rowIndex * cellSize,
             x: fieldIndex * cellSize,
             width: cellSize,
@@ -26,118 +25,100 @@
   </v-stage>
 </template>
 
-<script>
-export default {
-  name: 'BaseLayout',
-  data: () => ({
-    areaSize: 600,
-    commonKey: 0,
-    grid: [],
-    cellSize: 20,
-    rectConfig: {
-      stroke: 'white',
-      strokeWidth: 4,
-    },
-    lastAliveCount: 0,
-  }),
-  computed: {
-    configKonva() {
-      return {
-        width: this.areaSize,
-        height: this.areaSize,
-      }
-    },
-    lenX() {
-      return Math.round(this.areaSize / this.cellSize);
-    },
-    lenY() {
-      return Math.round(this.areaSize / this.cellSize);
-    },
-  },
-  created() {
-    return this.createGrid();
-  },
-  mounted() {
-    this.seed();
-      // eslint-disable-next-line vue/no-async-in-computed-properties
-    return setInterval(() => this.makeLife(), 170);
+<script setup>
+  import { ref, computed, defineEmits, watch, onMounted } from 'vue';
 
-  },
-  methods: {
-    makeLife() {
-      for (let y = 0; y <= this.lenY; y++) {
-        for (let x = 0; x <= this.lenX; x++) {
-          this.prepareField({x, y});
-        }
-      }
-    },
-    touchCell({x, y}) {
+  const areaSize = ref(600);
+  const commonKey = ref(0);
+  const cellSize = ref(20);
+  const grid = ref([]);
 
-      return this.prepareField({x: x, y: y});
-    },
-    switchField({x, y}) {
-      this.grid[y][x] = !this.grid[y][x];
-      this.commonKey++;
-    },
-    neighbourCount({x, y}) {
-      const all = [];
-      all.push(x && y ? this.grid[y-1][x-1] : false); //A
-      all.push(y ? this.grid[y-1][x] : false); //B
-      all.push(y && x < this.lenX ? this.grid[y-1][x+1] : false); //C
-      all.push(x ? this.grid[y][x-1] : false); //D
-      all.push(x < this.lenX ? this.grid[y][x+1] : false); //E
-      all.push(x && y < this.lenY ? this.grid[y+1][x-1] : false); //F
-      all.push(y < this.lenY ? this.grid[y+1][x] : false); //G
-      all.push(y < this.lenY && x < this.lenX ? this.grid[y+1][x+1] : false); //H
-      return all.filter(item => !!item).length;
-    },
-    prepareField({x, y}) {
-      const aliveNeighbours = this.neighbourCount({x,y});
-      if (!this.grid[y][x] && aliveNeighbours === 3) {
-        this.grid[y][x] = true;
+  const configKonva = computed(() => ({
+    width: areaSize.value,
+    height: areaSize.value
+  }));
+
+  const lenX = computed(() => Math.round(areaSize.value / cellSize.value));
+  const lenY = computed(() => Math.round(areaSize.value / cellSize.value));
+
+  function seed() {
+    const aliveCount = 300;
+    for (let i = 0; i <= aliveCount; i++) {
+      const x = random(lenX.value);
+      const y = random(lenY.value);
+      grid.value[y][x] = true;
+      commonKey.value++;
+    }
+  }
+
+  function makeLife() {
+    for (let y = 0; y <= lenY.value; y++) {
+      for (let x = 0; x <= lenX.value; x++) {
+        prepareField({x, y});
       }
-      if (this.grid[y][x]) {
-        if (aliveNeighbours < 2 || aliveNeighbours > 3) {
-          this.grid[y][x] = false;
-        }
+    }
+  }
+
+  function neighbourCount({x, y}) {
+    const all = [];
+    all.push(x && y ? grid.value[y-1][x-1] : false); //A
+    all.push(y ? grid.value[y-1][x] : false); //B
+    all.push(y && x < lenX.value ? grid.value[y-1][x+1] : false); //C
+    all.push(x ? grid.value[y][x-1] : false); //D
+    all.push(x < lenX.value ? grid.value[y][x+1] : false); //E
+    all.push(x && y < lenY.value ? grid.value[y+1][x-1] : false); //F
+    all.push(y < lenY.value ? grid.value[y+1][x] : false); //G
+    all.push(y < lenY.value && x < lenX.value ? grid.value[y+1][x+1] : false); //H
+    return all.filter(item => !!item).length;
+  }
+
+  function aliveCount() {
+    let count = 0;
+    for (let y = 0; y <= lenY.value; y++) {
+      const rowCount = grid.value[y].filter(item => !!item).length;
+      count += rowCount;
+    }
+    return count;
+  }
+
+  function prepareField({x, y}) {
+    const aliveNeighbours = neighbourCount({x,y});
+    if (!grid.value[y][x] && aliveNeighbours === 3) {
+      grid.value[y][x] = true;
+    }
+    if (grid.value[y][x]) {
+      if (aliveNeighbours < 2 || aliveNeighbours > 3) {
+        grid.value[y][x] = false;
       }
-      this.commonKey++;
-    },
-    aliveCount() {
-      let count = 0;
-      for (let y = 0; y <= this.lenY; y++) {
-        const rowCount = this.grid[y].filter(item => !!item).length;
-        count += rowCount;
+    }
+    commonKey.value++;
+  }
+
+  function random(max) {
+    return Math.round(Math.random() * (max - 1) + 1);
+  }
+
+  function createGrid() {
+    for (let i = 0; i <= lenY.value; i++) {
+      const row = [];
+      for (let j = 0; j <= lenX.value; j++) {
+        row.push(false);
       }
-      return count;
-    },
-    random(max) {
-        return Math.round(Math.random() * (max - 1) + 1);
-    },
-    seed() {
-      const aliveCount = 300;
-      for (let i = 0; i <= aliveCount; i++) {
-        const x = this.random(this.lenX);
-        const y = this.random(this.lenY);
-        this.grid[y][x] = true;
-        this.commonKey++;
-      }
-    },
-      createGrid() {
-        for (let i = 0; i <= this.lenY; i++) {
-          const row = [];
-          for (let j = 0; j <= this.lenX; j++) {
-              row.push(false);
-          }
-          this.grid.push(row);
-        }
-        return this.grid;
-      },
-  },
-  watch: {
-    commonKey() {
-      this.$emit('changeCount', 'Живых клеток: ' + this.aliveCount())
-    },
-  },
-}
+      grid.value.push(row);
+    }
+  }
+
+  const emit = defineEmits(['changeCount']);
+  watch(commonKey, () => {
+    emit('changeCount', 'Живых клеток: ' + aliveCount());
+  })
+
+  createGrid();
+
+  onMounted(() => {
+    seed();
+    setInterval(() => makeLife(), 170);
+  });
+
 </script>
+
