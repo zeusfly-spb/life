@@ -6,20 +6,12 @@
   </div>
 </template>
 
-<script>
-import BaseLayout from "@/components/BaseLayout.vue";
-export default {
-  name: 'App',
-  components: {
-    BaseLayout
-  },
-  methods: {
-    updateTitle(text) {
-      const titleEl = document.querySelector('head title');
-      titleEl.textContent = text;
-    }
+<script setup>
+  import BaseLayout from "@/components/BaseLayout.vue";
+  function updateTitle(text) {
+    const titleEl = document.querySelector('head title');
+    titleEl.textContent = text;
   }
-}
 </script>
 
 <style>
