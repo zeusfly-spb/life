@@ -1,9 +1,5 @@
 <template>
   <div id="app">
-      <vue-headful
-        :title="titleText"
-        description="LIFE"
-      />
     <BaseLayout
       @changeCount="updateTitle"
     />
@@ -17,12 +13,10 @@ export default {
   components: {
     BaseLayout
   },
-  data: () => ({
-    titleText: '',
-  }),
   methods: {
     updateTitle(text) {
-      this.titleText = text;
+      const titleEl = document.querySelector('head title');
+      titleEl.textContent = text;
     }
   }
 }
