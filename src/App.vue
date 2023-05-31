@@ -1,8 +1,6 @@
 <template>
   <div id="app">
-    <BaseLayout
-      @changeCount="updateTitle"
-    />
+    <BaseLayout @changeCount="updateTitle" />
   </div>
 </template>
 

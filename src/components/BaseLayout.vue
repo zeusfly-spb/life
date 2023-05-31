@@ -1,12 +1,7 @@
 <template>
-  <v-stage
-    :config="configKonva"
-  >
+  <v-stage :config="configKonva">
     <v-layer>
-      <div
-        v-for="(row, rowIndex) in grid"
-        :key="'row' + rowIndex"
-      >
+      <div v-for="(row, rowIndex) in grid" :key="'row' + rowIndex">
         <v-rect
           v-for="(field, fieldIndex) in row"
           :key="'field' + fieldIndex + commonKey"
@@ -123,5 +118,4 @@ onMounted(() => {
   seed();
   setInterval(() => makeLife(), 100);
 });
-
 </script>
