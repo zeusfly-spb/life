@@ -10,10 +10,9 @@
   "dependencies": {
     "core-js": "^3.8.3",
     "konva": "^9.0.2",
-    "vue": "^2.6.14",
-    "vue-headful": "^2.1.0",
-    "vue-konva": "^2.1.7",
-    "vue-meta": "^2.4.0"
+    "vue": "^3.2.36",
+    "vue-konva": "^3.0.2",
+    "vue-meta": "^3.0.0-alpha.10"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
@@ -21,13 +20,13 @@
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
+    "@vue/compiler-sfc": "^3.3.4",
     "eslint": "^8.41.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-vue": "^9.14.1",
-    "prettier": "2.8.8",
-    "vue-template-compiler": "^2.6.14"
+    "prettier": "2.8.8"
   },
   "eslintConfig": {
     "root": true,
