@@ -8,7 +8,10 @@
         :config="configKonva"
       >
         <v-layer>
-          <div v-for="(row, rowIndex) in grid" :key="'row' + rowIndex">
+          <div
+            v-for="(row, rowIndex) in grid"
+            :key="'row' + rowIndex"
+          >
             <component
               :is="props.type"
               v-for="(field, fieldIndex) in row"
@@ -52,10 +55,8 @@ const emit = defineEmits(['changeCount', 'changeActive']);
 
 const areaSize = ref(600);
 const commonKey = ref(0);
-const cellSize = ref(30);
+const cellSize = ref(20);
 const grid = ref([]);
-const plAr = ref([]);
-
 let angle = 0;
 
 const activeLife = computed({
@@ -226,15 +227,24 @@ function h(x, y) {
 
 function neighbourCount({x, y}) {
   const all = [];
-  // all.push(x && y && grid.value[y - 1][x - 1] || false); // A
-  all.push(a(x, y)); // A
-  all.push(b(x, y)); // B
-  all.push(c(x, y)); // C
-  all.push(d(x, y)); // D
-  all.push(e(x, y)); // E
-  all.push(f(x, y)); // F
-  all.push(g(x, y)); // G
-  all.push(h(x, y)); //H
+
+  all.push(x && y ? grid.value[y - 1][x - 1] : false); //A
+  all.push(y ? grid.value[y - 1][x] : false); //B
+  all.push(y && x < lenX.value ? grid.value[y - 1][x + 1] : false); //C
+  all.push(x ? grid.value[y][x - 1] : false); //D
+  all.push(x < lenX.value ? grid.value[y][x + 1] : false); //E
+  all.push(x && y < lenY.value ? grid.value[y + 1][x - 1] : false); //F
+  all.push(y < lenY.value ? grid.value[y + 1][x] : false); //G
+  all.push(y < lenY.value && x < lenX.value ? grid.value[y + 1][x + 1] : false); //H
+
+  // all.push(a(x, y)); // A
+  // all.push(b(x, y)); // B
+  // all.push(c(x, y)); // C
+  // all.push(d(x, y)); // D
+  // all.push(e(x, y)); // E
+  // all.push(f(x, y)); // F
+  // all.push(g(x, y)); // G
+  // all.push(h(x, y)); //H
   return all.filter((item) => !!item).length;
 }
 
