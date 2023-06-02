@@ -3,23 +3,12 @@
     <div class="controls">
       <label for="color-input">
         Разноцветные блоки
-        <input id="color-input" v-model="multicolored" type="checkbox"/>
-      </label>
-      <label for="unlimited-field">
-        Бесконечное поле
-        <input id="color-input" v-model="unlimited" type="checkbox"/>
+        <input id="color-input" v-model="multicolored" type="checkbox" />
       </label>
       <label for="type-select">
         Тип фигуры
-        <select
-          id="type-select"
-          v-model="type"
-        >
-          <option
-            v-for="type in types"
-            :key="type.name"
-            :value="type.value"
-          >
+        <select id="type-select" v-model="type">
+          <option v-for="type in types" :key="type.name" :value="type.value">
             {{ type.name }}
           </option>
         </select>
@@ -37,19 +26,18 @@
 </template>
 
 <script setup>
-import {ref} from "vue";
+import { ref } from "vue";
 import BaseLayout from "./components/BaseLayout.vue";
 
-
 const multicolored = ref(false);
-const active = ref(false);
-const type = ref('v-rect');
+const active = ref(true);
+const type = ref("v-rect");
 const unlimited = ref(false);
 
 const types = [
-  {name: 'Квадрат', value: 'v-rect'},
-  {name: 'Круг', value: 'v-circle'},
-  {name: 'Звезда', value: 'v-star'},
+  { name: "Квадрат", value: "v-rect" },
+  { name: "Круг", value: "v-circle" },
+  { name: "Звезда", value: "v-star" },
 ];
 
 function updateTitle(text) {
