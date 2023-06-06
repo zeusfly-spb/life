@@ -5,10 +5,10 @@
         <v-layer>
           <div v-for="(row, rowIndex) in grid" :key="'row' + rowIndex">
             <component
-                :is="props.type"
-                v-for="(field, fieldIndex) in row"
-                :key="'field' + fieldIndex + commonKey"
-                :config="{
+              :is="props.type"
+              v-for="(field, fieldIndex) in row"
+              :key="'field' + fieldIndex + commonKey"
+              :config="{
                 strokeWidth: 2,
                 stroke: 'white',
                 id: 'id-' + rowIndex + fieldIndex,
@@ -33,20 +33,20 @@
 
 <script setup>
 /* eslint-disable no-shadow,no-plusplus,arrow-parens, no-unused-vars */
-import {ref, computed, defineEmits, watch, onMounted, defineProps} from "vue";
+import { ref, computed, defineEmits, watch, onMounted, defineProps } from "vue";
 
 const props = defineProps({
   multicolor: Boolean,
-  type: {type: String, default: "v-rect"},
-  active: {type: Boolean, required: true},
-  unlimited: {type: Boolean, required: true},
+  type: { type: String, default: "v-rect" },
+  active: { type: Boolean, required: true },
+  unlimited: { type: Boolean, required: true },
 });
 
 const emit = defineEmits(["changeCount", "changeActive"]);
 
 const areaSize = ref(500);
 const commonKey = ref(0);
-const cellSize = ref(10);
+const cellSize = ref(20);
 const grid = ref([]);
 let angle = 0;
 
@@ -101,7 +101,7 @@ function makeLife() {
   angle = angle === 36 ? 0 : angle + 1;
   for (let y = 0; y < lenY.value; y++) {
     for (let x = 0; x < lenX.value; x++) {
-      prepareField({x, y});
+      prepareField({ x, y });
     }
   }
 }
@@ -109,62 +109,77 @@ function makeLife() {
 function unlimitedValue(x, y, letter) {
   let value = false;
   switch (letter) {
-    case 'a': {
-      value = !x && y && grid.value[y - 1][lenX.value - 1]
-          || x && !y && grid.value[lenY.value - 1][x - 1] ||
-          !x && !y && grid.value[lenY.value - 1][lenX.value - 1];
+    case "a": {
+      y = y === 0 ? lenY.value : y;
+      x = x === 0 ? lenX.value : x;
+      value = grid.value[y - 1][x - 1];
       break;
     }
-    case 'b': {
-      value = !y && grid.value[lenY.value - 1][x];
+    case "b": {
+      y = y === 0 ? lenY.value : y;
+      value = grid.value[y - 1][x];
       break;
     }
-    case 'c': {
-      value = !y && x < (lenX.value - 1) && grid.value[lenY.value - 1][x + 1] ||
-          y && x < (lenX.value - 1) && grid.value[y - 1][x + 1] ||
-          y && x === (lenX.value - 1) && grid.value[y - 1][0] ||
-          !y && x === (lenX.value - 1) && grid.value[lenY.value - 1][0];
+    case "c": {
+      y = y === 0 ? lenY.value : y;
+      x = x === lenX.value - 1 ? -1 : x;
+      value = grid.value[y - 1][x + 1];
       break;
     }
-    case 'd': {
-      value = !x && grid.value[y][lenX.value - 1];
+    case "d": {
+      x = x === 0 ? lenX.value : x;
+      value = grid.value[y][x - 1];
       break;
     }
-    case 'e': {
-      value = x === (lenX.value - 1) && grid.value[y][0];
+    case "e": {
+      x = x === lenX.value - 1 ? -1 : x;
+      value = grid.value[y][x + 1];
       break;
     }
-    case 'f': {
-      value = !x && y < (lenY.value - 1) && grid.value[y + 1][lenX.value - 1] ||
-          x && y === (lenY.value - 1) && grid.value[0][x - 1] ||
-          !x && y === (lenY.value - 1) && grid.value[0][lenX.value - 1];
+    case "f": {
+      y = y === lenY.value - 1 ? -1 : y;
+      x = x === 0 ? lenX.value : x;
+      value = grid.value[y + 1][x - 1];
       break;
     }
-    case 'g': {
-      value = y === (lenY.value - 1) && grid.value[0][x];
+    case "g": {
+      y = y === lenY.value - 1 ? -1 : y;
+      value = grid.value[y + 1][x];
       break;
     }
-    case 'h': {
-      value = y === (lenY.value - 1) && x < (lenX.value - 1) && grid.value[0][x + 1] ||
-          y < (lenY.value - 1) && x === (lenX.value - 1) && grid.value[y + 1][0] ||
-          y === (lenY.value - 1) && x === (lenX.value - 1) && grid.value[0][0];
+    case "h": {
+      y = y === lenY.value - 1 ? -1 : y;
+      x = x === lenX.value - 1 ? -1 : x;
+      value = grid.value[y + 1][x + 1];
       break;
     }
-
   }
   return props.unlimited && value;
 }
 
-function neighbourCount({x, y}) {
+function neighbourCount({ x, y }) {
   const all = [];
-  all.push(x && y && grid.value[y - 1][x - 1] || unlimitedValue(x, y, 'a')); //A
-  all.push(y && grid.value[y - 1][x] || unlimitedValue(x, y, 'b')); //B
-  all.push(y && x < (lenX.value - 1) && grid.value[y - 1][x + 1] || unlimitedValue(x, y, 'c')); //C
-  all.push(x && grid.value[y][x - 1] || unlimitedValue(x, y, 'd')); //D
-  all.push(x < (lenX.value - 1) && grid.value[y][x + 1] || unlimitedValue(x, y, 'e')); //E
-  all.push(x && y < (lenY.value - 1) && grid.value[y + 1][x - 1] || unlimitedValue(x, y, 'f')); //F
-  all.push(y < (lenY.value - 1) && grid.value[y + 1][x] || unlimitedValue(x, y, 'g')); //G
-  all.push(y < (lenY.value - 1) && x < (lenX.value - 1) && grid.value[y + 1][x + 1] || unlimitedValue(x, y, 'h')); //H
+  all.push((x && y && grid.value[y - 1][x - 1]) || unlimitedValue(x, y, "a")); //A
+  all.push((y && grid.value[y - 1][x]) || unlimitedValue(x, y, "b")); //B
+  all.push(
+    (y && x < lenX.value - 1 && grid.value[y - 1][x + 1]) ||
+      unlimitedValue(x, y, "c")
+  ); //C
+  all.push((x && grid.value[y][x - 1]) || unlimitedValue(x, y, "d")); //D
+  all.push(
+    (x < lenX.value - 1 && grid.value[y][x + 1]) || unlimitedValue(x, y, "e")
+  ); //E
+  all.push(
+    (x && y < lenY.value - 1 && grid.value[y + 1][x - 1]) ||
+      unlimitedValue(x, y, "f")
+  ); //F
+  all.push(
+    (y < lenY.value - 1 && grid.value[y + 1][x]) || unlimitedValue(x, y, "g")
+  ); //G
+  all.push(
+    (y < lenY.value - 1 && x < lenX.value - 1 && grid.value[y + 1][x + 1]) ||
+      unlimitedValue(x, y, "h")
+  ); //H
   return all.filter((item) => !!item).length;
 }
 
@@ -177,8 +192,8 @@ function aliveCount() {
   return count;
 }
 
-function prepareField({x, y}) {
-  const aliveNeighbours = neighbourCount({x, y});
+function prepareField({ x, y }) {
+  const aliveNeighbours = neighbourCount({ x, y });
   if (!grid.value[y][x] && aliveNeighbours === 3) {
     grid.value[y][x] = true;
   }
@@ -196,10 +211,10 @@ function random(max) {
 
 function randomColor() {
   return (
-      "#" +
-      random(255).toString(16) +
-      random(255).toString(16) +
-      random(255).toString(16)
+    "#" +
+    random(255).toString(16) +
+    random(255).toString(16) +
+    random(255).toString(16)
   );
 }
 
